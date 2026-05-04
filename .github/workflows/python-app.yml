@@ -1,0 +1,51 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python  
+
+name: Python application
+
+on:
+  push:
+    branches: [ "prod" ]
+  pull_request:
+    branches: [ "prod" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Stop and remove old container if exists
+      run: |
+        if [ "$(sudo docker ps -a -q -f name=labaidgpt)" ]; then
+          echo "Stopping running container..."
+          sudo docker stop labaidgpt || true
+          echo "Removing container..."
+          sudo docker rm labaidgpt || true
+        fi
+
+    - name: Remove old image if exists
+      run: |
+        if [ "$(sudo docker images -q labaidgpt)" ]; then
+          echo "Removing old image..."
+          sudo docker rmi -f labaidgpt || true
+        fi
+
+    - name: Build Docker image
+      run: sudo docker build -t labaidgpt .
+
+    - name: Run new container
+      run: |
+        sudo docker run -d \
+          --name labaidgpt \
+          -p 8501:8501 \
+          --env-file /home/labaid/labaidgpt/.env \
+          --restart always \
+          labaidgpt
+
+
