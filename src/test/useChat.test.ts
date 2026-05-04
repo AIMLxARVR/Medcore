@@ -1,0 +1,153 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { useChat } from '../hooks/useChat';
+import { callClaude } from '../services/anthropic';
+
+// Mock the anthropic service
+vi.mock('../services/anthropic', () => ({
+  callClaude: vi.fn(),
+}));
+
+describe('useChat Hook', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('initializes with default message', () => {
+    const { result } = renderHook(() => useChat());
+    
+    expect(result.current.msgs).toHaveLength(1);
+    expect(result.current.msgs[0].content).toBe('Hello! I\'m MedCore AI, your medical assistant. How can I help you today?');
+    expect(result.current.typing).toBe(false);
+    expect(result.current.error).toBe(null);
+    expect(result.current.input).toBe('');
+  });
+
+  it('updates input value', () => {
+    const { result } = renderHook(() => useChat());
+    
+    act(() => {
+      result.current.setInput('Hello, I have a question');
+    });
+    
+    expect(result.current.input).toBe('Hello, I have a question');
+  });
+
+  it('sends message successfully', async () => {
+    const mockResponse = { content: 'This is a test response from the AI.' };
+    (callClaude as jest.Mock).mockResolvedValue(mockResponse);
+    
+    const { result } = renderHook(() => useChat());
+    
+    // Set input
+    act(() => {
+      result.current.setInput('What are the symptoms of flu?');
+    });
+    
+    // Send message
+    await act(async () => {
+      await result.current.send();
+    });
+    
+    // Check that message was added
+    expect(result.current.msgs).toHaveLength(3); // Initial + user + AI
+    expect(result.current.msgs[1].content).toBe('What are the symptoms of flu?');
+    expect(result.current.msgs[2].content).toBe('This is a test response from the AI.');
+    expect(result.current.typing).toBe(false);
+    expect(result.current.input).toBe(''); // Input should be cleared
+  });
+
+  it('handles API errors gracefully', async () => {
+    const mockError = new Error('API Error');
+    (callClaude as jest.Mock).mockRejectedValue(mockError);
+    
+    const { result } = renderHook(() => useChat());
+    
+    // Set input and send
+    act(() => {
+      result.current.setInput('Test message');
+    });
+    
+    await act(async () => {
+      await result.current.send();
+    });
+    
+    // Should still add user message but show error
+    expect(result.current.msgs).toHaveLength(2); // Initial + user
+    expect(result.current.error).toBe('Failed to get response from AI');
+    expect(result.current.typing).toBe(false);
+  });
+
+  it('prevents sending empty messages', async () => {
+    const { result } = renderHook(() => useChat());
+    
+    await act(async () => {
+      await result.current.send('');
+    });
+    
+    expect(result.current.msgs).toHaveLength(1); // Only initial message
+    expect(callClaude).not.toHaveBeenCalled();
+  });
+
+  it('prevents sending while typing', async () => {
+    (callClaude as jest.Mock).mockImplementation(() => 
+      new Promise(resolve => setTimeout(() => resolve({ content: 'Delayed response' }), 100))
+    );
+    
+    const { result } = renderHook(() => useChat());
+    
+    // Start first message
+    act(() => {
+      result.current.setInput('First message');
+    });
+    
+    act(() => {
+      result.current.send();
+    });
+    
+    // Try to send second message while first is processing
+    act(() => {
+      result.current.setInput('Second message');
+    });
+    
+    await act(async () => {
+      await result.current.send();
+    });
+    
+    // Should only have initial + first message
+    expect(result.current.msgs).toHaveLength(2);
+  });
+
+  it('resets chat to initial state', () => {
+    const { result } = renderHook(() => useChat());
+    
+    // Add some messages
+    act(() => {
+      result.current.setInput('Test message');
+    });
+    
+    // Reset
+    act(() => {
+      result.current.reset();
+    });
+    
+    expect(result.current.msgs).toHaveLength(1);
+    expect(result.current.msgs[0].content).toBe('Hello! I\'m MedCore AI, your medical assistant. How can I help you today?');
+    expect(result.current.input).toBe('');
+    expect(result.current.error).toBe(null);
+  });
+
+  it('sends message with provided text parameter', async () => {
+    const mockResponse = { content: 'Response to provided text' };
+    (callClaude as jest.Mock).mockResolvedValue(mockResponse);
+    
+    const { result } = renderHook(() => useChat());
+    
+    await act(async () => {
+      await result.current.send('Direct message');
+    });
+    
+    expect(result.current.msgs[1].content).toBe('Direct message');
+    expect(result.current.input).toBe(''); // Input should remain empty
+  });
+});
