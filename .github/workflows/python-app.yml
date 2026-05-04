@@ -1,0 +1,27 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Python application
+
+on:
+  push:
+    branches: [ "prod" ]
+  pull_request:
+    branches: [ "prod" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: labaidgpt
+
+    steps:
+    - name: Build Docker image
+      run: docker build -t labaidgpt .
+
+      
+    - name: Run Image
+      run: docker run -d -p 8501:8501 --restart always labaidgpt
+
