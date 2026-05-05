@@ -2,46 +2,57 @@ import React, { useState } from 'react';
 import { C } from '../../constants/colors';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { aiApi, ApiError } from '../../services/api';
+import { sanitizeInput } from '../../utils/inputSanitizer';
 
-// Define analysis result type
+// Define analysis result type from backend
 interface AnalysisResult {
-  possibleConditions: Array<{ condition: string; probability: number; severity: string }>;
-  recommendations: string[];
-  urgency: string;
+  conditions: Array<{ name: string; confidence: number; icd: string }>;
+  tests: string[];
+  urgency: 'low' | 'medium' | 'high';
+  recommendation: string;
 }
 
 function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
   const [symptoms, setSymptoms] = useState('');
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async () => {
     if (!symptoms.trim()) return;
     
+    // Sanitize input for security
+    const sanitizedSymptoms = sanitizeInput(symptoms);
+    
     setLoading(true);
-    // Simulate AI analysis
-    setTimeout(() => {
-      setAnalysis({
-        possibleConditions: [
-          { condition: 'Common Cold', probability: 0.7, severity: 'mild' },
-          { condition: 'Flu', probability: 0.4, severity: 'moderate' },
-          { condition: 'Allergies', probability: 0.3, severity: 'mild' }
-        ],
-        recommendations: [
-          'Rest and stay hydrated',
-          'Monitor symptoms for 2-3 days',
-          'Consider over-the-counter medication for symptom relief',
-          'Seek medical attention if symptoms worsen'
-        ],
-        urgency: 'low'
-      });
+    setError(null);
+    
+    try {
+      // Call backend AI API for symptom analysis
+      const result = await aiApi.analyzeSymptoms(sanitizedSymptoms);
+      setAnalysis(result);
+    } catch (e) {
+      const errorMessage = e instanceof ApiError 
+        ? e.message 
+        : 'Failed to analyze symptoms. Please try again.';
+      setError(errorMessage);
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   const clearAnalysis = () => {
     setAnalysis(null);
     setSymptoms('');
+    setError(null);
+  };
+
+  // Urgency color mapping
+  const urgencyColors = {
+    high: { bg: '#f8d7da', border: '#f5c6cb', text: '#721c24' },
+    medium: { bg: '#fff3cd', border: '#ffeaa7', text: '#856404' },
+    low: { bg: '#d1edff', border: '#b8daff', text: '#004085' }
   };
 
   return (
@@ -107,6 +118,14 @@ function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
 
         {/* Results Section */}
         <div>
+          {error && (
+            <Card style={{ padding: 24, backgroundColor: '#f8d7da', borderColor: '#f5c6cb' }}>
+              <div style={{ fontSize: 14, color: '#721c24' }}>
+                Error: {error}
+              </div>
+            </Card>
+          )}
+
           {loading && (
             <Card style={{ padding: 24, textAlign: 'center' }}>
               <div style={{ fontSize: 16, color: C.muted, marginBottom: 16 }}>
@@ -130,16 +149,13 @@ function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
               <Card style={{ 
                 padding: 16, 
                 marginBottom: 16,
-                backgroundColor: analysis.urgency === 'high' ? '#f8d7da' : 
-                               analysis.urgency === 'medium' ? '#fff3cd' : '#d1edff',
-                borderColor: analysis.urgency === 'high' ? '#f5c6cb' : 
-                            analysis.urgency === 'medium' ? '#ffeaa7' : '#b8daff'
+                backgroundColor: urgencyColors[analysis.urgency].bg,
+                borderColor: urgencyColors[analysis.urgency].border
               }}>
                 <div style={{ 
                   fontSize: 16, 
                   fontWeight: 600, 
-                  color: analysis.urgency === 'high' ? '#721c24' : 
-                         analysis.urgency === 'medium' ? '#856404' : '#004085'
+                  color: urgencyColors[analysis.urgency].text
                 }}>
                   Urgency Level: {analysis.urgency.charAt(0).toUpperCase() + analysis.urgency.slice(1)}
                 </div>
@@ -150,14 +166,14 @@ function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
                 <h3 style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 16 }}>
                   Possible Conditions
                 </h3>
-                {analysis.possibleConditions.map((condition, index) => (
+                {analysis.conditions.map((condition, index) => (
                   <div key={index} style={{ marginBottom: 12, padding: 12, backgroundColor: '#f8f9fa', borderRadius: 8 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <div style={{ fontSize: 14, fontWeight: 500, color: C.text }}>
-                        {condition.condition}
+                        {condition.name}
                       </div>
                       <div style={{ fontSize: 12, color: C.muted }}>
-                        {Math.round(condition.probability * 100)}% probability
+                        ICD-10: {condition.icd}
                       </div>
                     </div>
                     <div style={{ 
@@ -168,43 +184,48 @@ function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
                       marginTop: 8 
                     }}>
                       <div style={{ 
-                        width: `${condition.probability * 100}%`, 
+                        width: `${condition.confidence}%`, 
                         height: '100%', 
-                        backgroundColor: condition.severity === 'severe' ? '#dc3545' : 
-                                         condition.severity === 'moderate' ? '#ffc107' : '#28a745',
+                        backgroundColor: condition.confidence > 70 ? '#28a745' : 
+                                         condition.confidence > 50 ? '#ffc107' : '#6c757d',
                         borderRadius: 2 
                       }}></div>
+                    </div>
+                    <div style={{ fontSize: 12, color: C.muted, marginTop: 4 }}>
+                      {condition.confidence}% confidence
                     </div>
                   </div>
                 ))}
               </Card>
 
-              {/* Recommendations */}
+              {/* Recommended Tests */}
               <Card style={{ padding: 24, marginBottom: 16 }}>
                 <h3 style={{ fontSize: 16, fontWeight: 600, color: C.text, marginBottom: 16 }}>
-                  Recommendations
+                  Recommended Tests
                 </h3>
-                {analysis.recommendations.map((rec, index) => (
-                  <div key={index} style={{ 
-                    display: 'flex', 
-                    alignItems: 'flex-start', 
-                    marginBottom: 8,
-                    padding: 8,
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: 6
-                  }}>
-                    <div style={{ 
-                      width: 6, 
-                      height: 6, 
-                      backgroundColor: C.primary, 
-                      borderRadius: '50%', 
-                      marginTop: 8, 
-                      marginRight: 12,
-                      flexShrink: 0
-                    }}></div>
-                    <div style={{ fontSize: 14, color: C.text }}>{rec}</div>
-                  </div>
-                ))}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {analysis.tests.map((test, index) => (
+                    <span key={index} style={{ 
+                      padding: '4px 12px', 
+                      backgroundColor: C.primaryLight, 
+                      borderRadius: 16,
+                      fontSize: 12,
+                      color: C.primaryMid
+                    }}>
+                      {test}
+                    </span>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Recommendation */}
+              <Card style={{ padding: 24, marginBottom: 16, backgroundColor: C.primaryLight }}>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: C.primary, marginBottom: 8 }}>
+                  Clinical Recommendation
+                </h3>
+                <p style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>
+                  {analysis.recommendation}
+                </p>
               </Card>
 
               {/* Action Buttons */}
@@ -219,7 +240,7 @@ function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
             </div>
           )}
 
-          {!analysis && !loading && (
+          {!analysis && !loading && !error && (
             <Card style={{ padding: 24, textAlign: 'center' }}>
               <div style={{ fontSize: 16, color: C.muted }}>
                 Enter your symptoms to get AI-powered analysis and recommendations.

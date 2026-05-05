@@ -8,6 +8,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { PrismaClient } = require('@prisma/client');
+const { authenticate } = require('../middleware/auth');
 
 const prisma = new PrismaClient();
 
@@ -128,5 +129,102 @@ function generateTokens(user) {
     },
   };
 }
+
+// POST /api/auth/logout
+// In production, you'd blacklist the token. For now, we just acknowledge the request.
+// The client should discard the token from local storage.
+router.post('/logout', authenticate, async (req, res) => {
+  try {
+    // Log the logout action for audit purposes
+    console.log(`User ${req.user.email} logged out`);
+    
+    // In a production system, you would:
+    // 1. Add the access token to a blacklist in Redis
+    // 2. Remove the refresh token from the database
+    // For MVP, we just acknowledge successful logout
+    
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ error: 'Logout failed' });
+  }
+});
+
+// GET /api/auth/me - Get current user profile
+router.get('/me', authenticate, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        bloodGroup: true,
+        dateOfBirth: true,
+        createdAt: true,
+      },
+    });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    // Get additional profile data based on role
+    let profile = null;
+    if (user.role === 'DOCTOR') {
+      profile = await prisma.doctorProfile.findUnique({
+        where: { userId: user.id },
+      });
+    } else if (user.role === 'PATIENT') {
+      profile = await prisma.patientProfile.findUnique({
+        where: { userId: user.id },
+      });
+    }
+    
+res.json({ ...user, profile });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({ error: 'Failed to get profile' });
+  }
+});
+
+// PATCH /api/auth/me - Update current user profile
+router.patch('/me', authenticate, async (req, res) => {
+  try {
+    const { firstName, lastName, phone, bloodGroup, dateOfBirth } = req.body;
+    
+    // Build update data - only allow specific fields to be updated
+    const updateData = {};
+    if (firstName !== undefined) updateData.firstName = firstName;
+    if (lastName !== undefined) updateData.lastName = lastName;
+    if (phone !== undefined) updateData.phone = phone;
+    if (bloodGroup !== undefined) updateData.bloodGroup = bloodGroup;
+    if (dateOfBirth !== undefined) updateData.dateOfBirth = new Date(dateOfBirth);
+    
+    const user = await prisma.user.update({
+      where: { id: req.user.id },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        role: true,
+        bloodGroup: true,
+        dateOfBirth: true,
+        updatedAt: true,
+      },
+    });
+    
+    res.json(user);
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
 
 module.exports = router;

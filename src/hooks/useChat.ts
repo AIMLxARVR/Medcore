@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { callClaude } from '../services/anthropic';
+import { aiApi, ApiError } from '../services/api';
 import { sanitizeInput } from '../utils/inputSanitizer';
 
 interface Message {
@@ -23,22 +23,30 @@ export const useChat = () => {
   const [error, setError] = useState<string | null>(null);
 
   const send = async (text?: string) => {
-    const rawTxt = text || input;
-    const txt = sanitizeInput(rawTxt.trim());
+    const txt = (text || input).trim();
     if (!txt || typing) return;
+    
+    // Sanitize user input for security
+    const sanitizedText = sanitizeInput(txt);
+    
     setInput("");
     setError(null);
-    // Sanitize user input before displaying
-    setMsgs(p => [...p, { from: "user", text: txt }]);
+    setMsgs(p => [...p, { from: "user", text: sanitizedText }]);
     setTyping(true);
     try {
-      const { replyText, updatedHistory } = await callClaude(txt, apiHistory);
-      setApiHistory(updatedHistory);
-      // Sanitize bot response before displaying
-      const sanitizedReply = sanitizeInput(replyText);
-      setMsgs(p => [...p, { from: "bot", text: sanitizedReply }]);
+      // Call backend AI API (secured with JWT)
+      const { reply, history } = await aiApi.chat({
+        message: sanitizedText,
+        history: apiHistory,
+      });
+      // Cast history from backend response
+      setApiHistory(history as ApiMessage[]);
+      setMsgs(p => [...p, { from: "bot", text: reply }]);
     } catch (e) {
-      setError("MedBot is temporarily unavailable. Please try again.");
+      const errorMessage = e instanceof ApiError 
+        ? e.message 
+        : "MedBot is temporarily unavailable. Please try again.";
+      setError(errorMessage);
       setMsgs(p => [...p, { from: "bot", text: "⚠️ I'm having a brief connectivity issue. Please try again in a moment.", isError: true }]);
     } finally {
       setTyping(false);

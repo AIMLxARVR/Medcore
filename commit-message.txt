@@ -1,9 +1,0 @@
-feat(backend): Express.js backend implementation
-
-- Replace NestJS with simpler Express.js backend
-- Add JWT authentication (register, login, refresh)
-- Add doctor routes (list, get, availability)
-- Add appointment routes (create, update, list)
-- Add auth middleware with role-based access
-- Add Prisma ORM integration
-- Clean up unused NestJS files

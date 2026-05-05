@@ -15,6 +15,9 @@ const app = express();
 const authRoutes = require('./routes/auth');
 const doctorsRoutes = require('./routes/doctors');
 const appointmentsRoutes = require('./routes/appointments');
+const aiRoutes = require('./routes/ai');
+const reviewsRoutes = require('./routes/reviews');
+const adminRoutes = require('./routes/admin');
 
 // Middleware
 app.use(helmet());
@@ -35,6 +38,9 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/doctors', doctorsRoutes);
 app.use('/api/appointments', appointmentsRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/reviews', reviewsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
