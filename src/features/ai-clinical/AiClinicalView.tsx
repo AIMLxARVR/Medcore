@@ -3,9 +3,16 @@ import { C } from '../../constants/colors';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 
+// Define analysis result type
+interface AnalysisResult {
+  possibleConditions: Array<{ condition: string; probability: number; severity: string }>;
+  recommendations: string[];
+  urgency: string;
+}
+
 function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
   const [symptoms, setSymptoms] = useState('');
-  const [analysis, setAnalysis] = useState(null);
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleAnalyze = async () => {

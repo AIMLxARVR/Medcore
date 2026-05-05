@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { C } from '../../constants/colors';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
 
 function BookingView({ doctor, onNav }: { doctor: any, onNav: (view: string) => void }) {
   const [form, setForm] = useState({

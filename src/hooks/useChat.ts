@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { callClaude } from '../services/anthropic';
+import { sanitizeInput } from '../utils/inputSanitizer';
 
 interface Message {
   from: 'user' | 'bot';
@@ -22,16 +23,20 @@ export const useChat = () => {
   const [error, setError] = useState<string | null>(null);
 
   const send = async (text?: string) => {
-    const txt = (text || input).trim();
+    const rawTxt = text || input;
+    const txt = sanitizeInput(rawTxt.trim());
     if (!txt || typing) return;
     setInput("");
     setError(null);
+    // Sanitize user input before displaying
     setMsgs(p => [...p, { from: "user", text: txt }]);
     setTyping(true);
     try {
       const { replyText, updatedHistory } = await callClaude(txt, apiHistory);
       setApiHistory(updatedHistory);
-      setMsgs(p => [...p, { from: "bot", text: replyText }]);
+      // Sanitize bot response before displaying
+      const sanitizedReply = sanitizeInput(replyText);
+      setMsgs(p => [...p, { from: "bot", text: sanitizedReply }]);
     } catch (e) {
       setError("MedBot is temporarily unavailable. Please try again.");
       setMsgs(p => [...p, { from: "bot", text: "⚠️ I'm having a brief connectivity issue. Please try again in a moment.", isError: true }]);
