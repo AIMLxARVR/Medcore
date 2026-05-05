@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { C } from '../../constants/colors';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 
 function PortalView({ onNav }: { onNav: (view: string) => void }) {
   const [activeTab, setActiveTab] = useState('records');
@@ -36,11 +36,11 @@ function PortalView({ onNav }: { onNav: (view: string) => void }) {
           <div style={{ fontSize: 14, color: C.muted }}>Upcoming Appointments</div>
         </Card>
         <Card style={{ padding: 16, textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: C.success }}>12</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: C.green }}>12</div>
           <div style={{ fontSize: 14, color: C.muted }}>Medical Records</div>
         </Card>
         <Card style={{ padding: 16, textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: C.warning }}>2</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: C.amber }}>2</div>
           <div style={{ fontSize: 14, color: C.muted }}>Active Prescriptions</div>
         </Card>
       </div>
@@ -129,7 +129,7 @@ function PortalView({ onNav }: { onNav: (view: string) => void }) {
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: C.warning }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: C.amber }}>
                       {rx.refills} refills
                     </div>
                     <Button size="sm" variant="outline" style={{ marginTop: 8 }}>

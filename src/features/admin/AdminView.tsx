@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { C } from '../../constants/colors';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 
 function AdminView({ onNav }: { onNav: (view: string) => void }) {
   const [activeTab, setActiveTab] = useState('users');
@@ -31,10 +31,10 @@ function AdminView({ onNav }: { onNav: (view: string) => void }) {
     switch (status) {
       case 'active':
       case 'success':
-      case 'up': return C.success;
+      case 'up': return C.green;
       case 'inactive': return C.muted;
-      case 'warning': return C.warning;
-      case 'down': return C.danger;
+      case 'warning': return C.amber;
+      case 'down': return C.red;
       default: return C.text;
     }
   };

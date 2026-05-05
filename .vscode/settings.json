@@ -1,0 +1,8 @@
+{
+    "chat.agent.maxRequests": 99,
+    "editor.wordWrap": "on",
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 13,
+    "Codegeex.CompletionDelay": 2,
+    "Codegeex.RepoIndex": true
+}

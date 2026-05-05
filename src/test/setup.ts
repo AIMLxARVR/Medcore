@@ -32,3 +32,6 @@ global.IntersectionObserver = class IntersectionObserver {
     return [];
   }
 };
+
+// Mock scrollIntoView
+HTMLElement.prototype.scrollIntoView = vi.fn();

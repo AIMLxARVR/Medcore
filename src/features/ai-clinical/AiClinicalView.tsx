@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { C } from '../../constants/colors';
-import { Card } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 
 function AiClinicalView({ onNav }: { onNav: (view: string) => void }) {
   const [symptoms, setSymptoms] = useState('');

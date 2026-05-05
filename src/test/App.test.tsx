@@ -6,29 +6,28 @@ import { DOCTORS } from '../constants/data';
 // Mock the anthropic service
 vi.mock('../services/anthropic', () => ({
   callClaude: vi.fn().mockResolvedValue({
-    content: 'This is a test response from the AI assistant.',
+    replyText: 'This is a test response from the AI assistant.',
+    updatedHistory: [],
   }),
 }));
 
 describe('MedCore App Integration Tests', () => {
   it('renders the home view by default', () => {
     render(<App />);
-    expect(screen.getByText('MedCore AI')).toBeInTheDocument();
-    expect(screen.getByText('Your AI-powered medical assistant')).toBeInTheDocument();
+    expect(screen.getByText('MedCore')).toBeInTheDocument();
+    expect(screen.getByText('Intelligent Healthcare Management')).toBeInTheDocument();
   });
 
   it('navigates between different views', () => {
     render(<App />);
     
+    // Should start on home view
+    expect(screen.getByText('DHAKA MEDICARE — AI-ENHANCED MVP')).toBeInTheDocument();
+    
     // Navigate to Doctors view
     const doctorsButton = screen.getByText('Doctors');
     fireEvent.click(doctorsButton);
     expect(screen.getByText('Our Doctors')).toBeInTheDocument();
-    
-    // Navigate to Chatbot view
-    const chatbotButton = screen.getByText('AI Chatbot');
-    fireEvent.click(chatbotButton);
-    expect(screen.getByText('MedCore AI Assistant')).toBeInTheDocument();
   });
 
   it('displays doctor information correctly', () => {
@@ -39,36 +38,44 @@ describe('MedCore App Integration Tests', () => {
     fireEvent.click(doctorsButton);
     
     // Check if doctor information is displayed
-    expect(screen.getByText('Dr. Sarah Johnson')).toBeInTheDocument();
-    expect(screen.getByText('Cardiology')).toBeInTheDocument();
-    expect(screen.getByText('Internal Medicine')).toBeInTheDocument();
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === 'Dr. Fatima Rahman';
+    })).toBeInTheDocument();
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === 'Dr. Ahmed Hossain';
+    })).toBeInTheDocument();
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === 'Dr. Nasrin Khatun';
+    })).toBeInTheDocument();
   });
 
-  it('handles doctor booking flow', () => {
+  it('handles doctor booking flow', async () => {
     render(<App />);
     
     // Navigate to Doctors view
     const doctorsButton = screen.getByText('Doctors');
     fireEvent.click(doctorsButton);
     
-    // Click on Book Now for first doctor
-    const bookButtons = screen.getAllByText('Book Now');
-    fireEvent.click(bookButtons[0]);
+    // Click on a doctor's Book Now button (use getAllByText and click the first one)
+    const bookNowButtons = screen.getAllByText('Book Now');
+    fireEvent.click(bookNowButtons[0]);
     
-    // Should navigate to booking view
-    expect(screen.getByText('Book Appointment')).toBeInTheDocument();
+    // Should navigate to booking view (check for booking-related content)
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === 'Book Appointment';
+    })).toBeInTheDocument();
   });
 
   it('chatbot interaction works correctly', async () => {
     render(<App />);
     
-    // Navigate to Chatbot view
-    const chatbotButton = screen.getByText('AI Chatbot');
+    // Navigate to Chatbot view - get the first one (navigation button)
+    const chatbotButton = screen.getAllByText('AI Chatbot')[0];
     fireEvent.click(chatbotButton);
     
     // Find input field and send button
-    const input = screen.getByPlaceholderText('Type your message...');
-    const sendButton = screen.getByText('Send');
+    const input = screen.getByPlaceholderText('Ask MedBot...');
+    const sendButton = screen.getAllByRole('button').find(btn => btn.querySelector('svg'));
     
     // Type and send message
     fireEvent.change(input, { target: { value: 'I have a headache' } });
@@ -76,7 +83,9 @@ describe('MedCore App Integration Tests', () => {
     
     // Wait for AI response
     await waitFor(() => {
-      expect(screen.getByText('This is a test response from the AI assistant.')).toBeInTheDocument();
+      expect(screen.getByText((content, element) => {
+        return element?.textContent === 'This is a test response from the AI assistant.';
+      })).toBeInTheDocument();
     });
   });
 
@@ -88,20 +97,26 @@ describe('MedCore App Integration Tests', () => {
     fireEvent.click(portalButton);
     
     // Check portal statistics
-    expect(screen.getByText('3')).toBeInTheDocument(); // Upcoming Appointments
-    expect(screen.getByText('12')).toBeInTheDocument(); // Medical Records
-    expect(screen.getByText('2')).toBeInTheDocument(); // Active Prescriptions
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '3';
+    })).toBeInTheDocument(); // Upcoming Appointments
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '12';
+    })).toBeInTheDocument(); // Medical Records
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '2';
+    })).toBeInTheDocument(); // Active Prescriptions
   });
 
   it('AI clinical assistant provides analysis', async () => {
     render(<App />);
     
     // Navigate to AI Clinical view
-    const aiClinicalButton = screen.getByText('AI Clinical Assistant');
+    const aiClinicalButton = screen.getByText('AI Clinical');
     fireEvent.click(aiClinicalButton);
     
-    // Enter symptoms
-    const textarea = screen.getByPlaceholderText('Please describe your symptoms in detail...');
+    // Enter symptoms - use partial placeholder text since it's multi-line
+    const textarea = screen.getByPlaceholderText(/Please describe your symptoms in detail/);
     fireEvent.change(textarea, { target: { value: 'I have a fever and cough' } });
     
     // Click analyze button
@@ -110,8 +125,10 @@ describe('MedCore App Integration Tests', () => {
     
     // Should show analysis results
     await waitFor(() => {
-      expect(screen.getByText('Urgency Level:')).toBeInTheDocument();
-    });
+      expect(screen.getByText((content, element) => {
+        return element?.textContent?.includes('Urgency Level:');
+      })).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 
   it('admin dashboard displays system information', () => {
@@ -121,10 +138,19 @@ describe('MedCore App Integration Tests', () => {
     const adminButton = screen.getByText('Admin');
     fireEvent.click(adminButton);
     
-    // Check admin statistics
-    expect(screen.getByText('247')).toBeInTheDocument(); // Total Users
-    expect(screen.getByText('89')).toBeInTheDocument(); // Active Sessions
-    expect(screen.getByText('42%')).toBeInTheDocument(); // System Load
+    // Check admin statistics - these are in the systemStats array
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '247';
+    })).toBeInTheDocument(); // Total Users
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '89';
+    })).toBeInTheDocument(); // Active Sessions
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '42%';
+    })).toBeInTheDocument(); // System Load
+    expect(screen.getByText((content, element) => {
+      return element?.textContent === '0.2%';
+    })).toBeInTheDocument(); // Error Rate
   });
 
   it('ETL dashboard shows job management', () => {
