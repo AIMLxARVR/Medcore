@@ -1,14 +1,15 @@
 import React from 'react';
 import { Stethoscope } from 'lucide-react';
 import styles from './NavBar.module.css';
+import { ViewType } from '../../types';
 
 interface NavBarProps {
-  view: string;
-  onNav: (view: string) => void;
+  view: ViewType;
+  onNav: (view: ViewType) => void;
 }
 
 interface Tab {
-  k: string;
+  k: ViewType;
   l: string;
 }
 

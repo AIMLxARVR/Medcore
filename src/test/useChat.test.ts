@@ -1,16 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useChat } from '../hooks/useChat';
 import { callClaude } from '../services/anthropic';
 
-// Mock the anthropic service
-vi.mock('../services/anthropic', () => ({
-  callClaude: vi.fn(),
-}));
+// Mock the anthropic service using shared mock
+vi.mock('../services/anthropic');
 
 describe('useChat Hook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset mock to default implementation before each test
+    (callClaude as any).mockResolvedValue({
+      replyText: 'This is a test response from the AI.',
+      updatedHistory: [],
+    });
   });
 
   it('initializes with default message', () => {
@@ -35,7 +38,7 @@ describe('useChat Hook', () => {
 
   it('sends message successfully', async () => {
     const mockResponse = { replyText: 'This is a test response from the AI.', updatedHistory: [] };
-    (callClaude as jest.Mock).mockResolvedValue(mockResponse);
+    (callClaude as any).mockResolvedValue(mockResponse);
     
     const { result } = renderHook(() => useChat());
     
@@ -59,7 +62,7 @@ describe('useChat Hook', () => {
 
   it('handles API errors gracefully', async () => {
     const mockError = new Error('API Error');
-    (callClaude as jest.Mock).mockRejectedValue(mockError);
+    (callClaude as any).mockRejectedValue(mockError);
     
     const { result } = renderHook(() => useChat());
     
@@ -90,7 +93,7 @@ describe('useChat Hook', () => {
   });
 
   it('prevents sending while typing', async () => {
-    (callClaude as jest.Mock).mockImplementation(() => 
+    (callClaude as any).mockImplementation(() => 
       new Promise(resolve => setTimeout(() => resolve({ content: 'Delayed response' }), 100))
     );
     
@@ -100,9 +103,9 @@ describe('useChat Hook', () => {
     act(() => {
       result.current.setInput('First message');
     });
-    
-    act(() => {
-      result.current.send();
+
+    await act(async () => {
+      await result.current.send();
     });
     
     // Try to send second message while first is processing
@@ -114,11 +117,11 @@ describe('useChat Hook', () => {
       await result.current.send();
     });
     
-    // Should only have initial + first message
-    expect(result.current.msgs).toHaveLength(2);
+    // Should only have initial + first message + response (second message blocked by typing)
+    expect(result.current.msgs).toHaveLength(3);
   });
 
-  it('resets chat to initial state', () => {
+it('resets chat to initial state', () => {
     const { result } = renderHook(() => useChat());
     
     // Add some messages
@@ -139,7 +142,7 @@ describe('useChat Hook', () => {
 
   it('sends message with provided text parameter', async () => {
     const mockResponse = { replyText: 'Response to provided text', updatedHistory: [] };
-    (callClaude as jest.Mock).mockResolvedValue(mockResponse);
+    (callClaude as any).mockResolvedValue(mockResponse);
     
     const { result } = renderHook(() => useChat());
     

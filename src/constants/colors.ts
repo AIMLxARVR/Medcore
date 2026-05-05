@@ -8,4 +8,8 @@ export const C = {
   teal:"#0F766E",tealLight:"#F0FDFA",
   bg:"#F0F4F8",card:"#FFFFFF",border:"#E2E8F0",
   text:"#0F172A",muted:"#64748B",light:"#94A3B8",
+  // Aliases for compatibility
+  warning:"#B45309",
+  success:"#059669", 
+  danger:"#DC2626",
 };

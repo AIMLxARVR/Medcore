@@ -15,15 +15,22 @@ const Avatar = ({ init, color, size = 'md' }: AvatarProps) => {
     fontSize: `${size * 0.3}px`,
   } : {};
 
+  // Build style object with explicit values to ensure they're applied
+  const style: React.CSSProperties = {
+    ...customStyle,
+  };
+
+  // Only apply color styles if color is provided
+  if (color) {
+    style.backgroundColor = `${color}22`;
+    style.borderColor = `${color}44`;
+    style.color = color;
+  }
+
   return (
     <div
       className={`${styles.avatar} ${sizeClass}`}
-      style={{
-        backgroundColor: color ? `${color}22` : undefined,
-        borderColor: color ? `${color}44` : undefined,
-        color: color || undefined,
-        ...customStyle,
-      }}
+      style={style}
     >
       {init}
     </div>

@@ -10,6 +10,8 @@ interface ButtonProps {
   disabled?: boolean;
   style?: React.CSSProperties;
   type?: 'button' | 'submit' | 'reset';
+  sx?: React.CSSProperties;
+  className?: string;
 }
 
 const Button = ({
@@ -19,16 +21,24 @@ const Button = ({
   size = 'md',
   full = false,
   disabled = false,
-  style: sx = {},
-  type = 'button'
+  style: sx,
+  type = 'button',
+  sx: customSx,
+  className
 }: ButtonProps) => {
+  // Merge custom styles with component styles
+  const buttonStyle: React.CSSProperties = {
+    ...sx,
+    ...customSx,
+  };
+
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`${styles.button} ${styles[variant]} ${styles[size]} ${full ? styles.full : ''}`}
-      style={sx}
+      className={`${styles.button} ${styles[variant]} ${styles[size]} ${full ? styles.full : ''} ${className || ''}`}
+      style={buttonStyle}
     >
       {children}
     </button>

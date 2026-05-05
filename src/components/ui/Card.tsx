@@ -7,19 +7,22 @@ interface CardProps {
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'interactive' | 'bordered' | 'elevated';
   onClick?: () => void;
+  className?: string;
 }
 
 const Card = ({
   children,
-  style: sx = {},
+  style: sx,
   size = 'md',
   variant = 'default',
-  onClick
+  onClick,
+  className
 }: CardProps) => {
   const cardClasses = [
     styles.card,
     styles[size],
     variant !== 'default' ? styles[variant] : '',
+    className || '',
   ].filter(Boolean).join(' ');
 
   return (

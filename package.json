@@ -16,18 +16,22 @@
     "test:unit": "vitest run --config vitest.unit.config.ts"
   },
   "dependencies": {
+    "dompurify": "^3.4.2",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^7.14.2",
+    "recharts": "^2.10.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.5.1",
+    "@types/dompurify": "^3.0.5",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.2",
+    "@typescript-eslint/parser": "^8.59.2",
     "@vitejs/plugin-react": "^4.0.3",
     "@vitest/coverage-v8": "^1.0.4",
     "@vitest/ui": "^1.0.4",

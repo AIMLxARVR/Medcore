@@ -14,6 +14,7 @@ export default defineConfig({
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
+        globalScope: true,
       },
     },
     coverage: {

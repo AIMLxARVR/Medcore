@@ -1,14 +1,25 @@
 import { useState } from 'react';
 import { callClaude } from '../services/anthropic';
 
-const INIT_MSG = { from: "bot", text: "Hello! 👋 I'm MedBot, your MedCore AI assistant.\n\nI can help you:\n• 📅 Book or manage appointments\n• 🩺 Check doctor availability\n• 📊 View your reports & history\n• 💊 Symptom guidance\n• 🔔 Check appointment status\n\nWhat do you need today?" };
+interface Message {
+  from: 'user' | 'bot';
+  text: string;
+  isError?: boolean;
+}
+
+interface ApiMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+const INIT_MSG: Message = { from: "bot", text: "Hello! 👋 I'm MedBot, your MedCore AI assistant.\n\nI can help you:\n• 📅 Book or manage appointments\n• 🩺 Check doctor availability\n• 📊 View your reports & history\n• 💊 Symptom guidance\n• 🔔 Check appointment status\n\nWhat do you need today?" };
 
 export const useChat = () => {
-  const [msgs, setMsgs] = useState([INIT_MSG]);
-  const [apiHistory, setApiHistory] = useState([]);
+  const [msgs, setMsgs] = useState<Message[]>([INIT_MSG]);
+  const [apiHistory, setApiHistory] = useState<ApiMessage[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const send = async (text?: string) => {
     const txt = (text || input).trim();
