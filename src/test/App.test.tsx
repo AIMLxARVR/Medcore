@@ -21,7 +21,7 @@ describe('MedCore App Integration Tests', () => {
     render(<App />);
     
     // Navigate to Doctors view
-    const doctorsButton = screen.getByText('Find Doctors');
+    const doctorsButton = screen.getByText('Doctors');
     fireEvent.click(doctorsButton);
     expect(screen.getByText('Our Doctors')).toBeInTheDocument();
     
@@ -35,7 +35,7 @@ describe('MedCore App Integration Tests', () => {
     render(<App />);
     
     // Navigate to Doctors view
-    const doctorsButton = screen.getByText('Find Doctors');
+    const doctorsButton = screen.getByText('Doctors');
     fireEvent.click(doctorsButton);
     
     // Check if doctor information is displayed
@@ -48,7 +48,7 @@ describe('MedCore App Integration Tests', () => {
     render(<App />);
     
     // Navigate to Doctors view
-    const doctorsButton = screen.getByText('Find Doctors');
+    const doctorsButton = screen.getByText('Doctors');
     fireEvent.click(doctorsButton);
     
     // Click on Book Now for first doctor
@@ -84,7 +84,7 @@ describe('MedCore App Integration Tests', () => {
     render(<App />);
     
     // Navigate to Patient Portal
-    const portalButton = screen.getByText('Patient Portal');
+    const portalButton = screen.getByText('My Portal');
     fireEvent.click(portalButton);
     
     // Check portal statistics
@@ -118,7 +118,7 @@ describe('MedCore App Integration Tests', () => {
     render(<App />);
     
     // Navigate to Admin view
-    const adminButton = screen.getByText('Admin Dashboard');
+    const adminButton = screen.getByText('Admin');
     fireEvent.click(adminButton);
     
     // Check admin statistics
@@ -131,7 +131,7 @@ describe('MedCore App Integration Tests', () => {
     render(<App />);
     
     // Navigate to ETL view
-    const etlButton = screen.getByText('Data Management');
+    const etlButton = screen.getAllByText('ETL Hub')[0]; // Get the first ETL Hub button (navigation)
     fireEvent.click(etlButton);
     
     // Check ETL jobs

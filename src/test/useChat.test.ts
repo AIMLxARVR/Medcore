@@ -17,7 +17,7 @@ describe('useChat Hook', () => {
     const { result } = renderHook(() => useChat());
     
     expect(result.current.msgs).toHaveLength(1);
-    expect(result.current.msgs[0].content).toBe('Hello! I\'m MedCore AI, your medical assistant. How can I help you today?');
+    expect(result.current.msgs[0].text).toBe('Hello! 👋 I\'m MedBot, your MedCore AI assistant.\n\nI can help you:\n• 📅 Book or manage appointments\n• 🩺 Check doctor availability\n• 📊 View your reports & history\n• 💊 Symptom guidance\n• 🔔 Check appointment status\n\nWhat do you need today?');
     expect(result.current.typing).toBe(false);
     expect(result.current.error).toBe(null);
     expect(result.current.input).toBe('');
@@ -34,7 +34,7 @@ describe('useChat Hook', () => {
   });
 
   it('sends message successfully', async () => {
-    const mockResponse = { content: 'This is a test response from the AI.' };
+    const mockResponse = { replyText: 'This is a test response from the AI.', updatedHistory: [] };
     (callClaude as jest.Mock).mockResolvedValue(mockResponse);
     
     const { result } = renderHook(() => useChat());
@@ -51,8 +51,8 @@ describe('useChat Hook', () => {
     
     // Check that message was added
     expect(result.current.msgs).toHaveLength(3); // Initial + user + AI
-    expect(result.current.msgs[1].content).toBe('What are the symptoms of flu?');
-    expect(result.current.msgs[2].content).toBe('This is a test response from the AI.');
+    expect(result.current.msgs[1].text).toBe('What are the symptoms of flu?');
+    expect(result.current.msgs[2].text).toBe('This is a test response from the AI.');
     expect(result.current.typing).toBe(false);
     expect(result.current.input).toBe(''); // Input should be cleared
   });
@@ -72,9 +72,9 @@ describe('useChat Hook', () => {
       await result.current.send();
     });
     
-    // Should still add user message but show error
-    expect(result.current.msgs).toHaveLength(2); // Initial + user
-    expect(result.current.error).toBe('Failed to get response from AI');
+    // Should still add user message and error message
+    expect(result.current.msgs).toHaveLength(3); // Initial + user + error
+    expect(result.current.error).toBe('MedBot is temporarily unavailable. Please try again.');
     expect(result.current.typing).toBe(false);
   });
 
@@ -132,13 +132,13 @@ describe('useChat Hook', () => {
     });
     
     expect(result.current.msgs).toHaveLength(1);
-    expect(result.current.msgs[0].content).toBe('Hello! I\'m MedCore AI, your medical assistant. How can I help you today?');
+    expect(result.current.msgs[0].text).toBe('Hello! 👋 I\'m MedBot, your MedCore AI assistant.\n\nI can help you:\n• 📅 Book or manage appointments\n• 🩺 Check doctor availability\n• 📊 View your reports & history\n• 💊 Symptom guidance\n• 🔔 Check appointment status\n\nWhat do you need today?');
     expect(result.current.input).toBe('');
     expect(result.current.error).toBe(null);
   });
 
   it('sends message with provided text parameter', async () => {
-    const mockResponse = { content: 'Response to provided text' };
+    const mockResponse = { replyText: 'Response to provided text', updatedHistory: [] };
     (callClaude as jest.Mock).mockResolvedValue(mockResponse);
     
     const { result } = renderHook(() => useChat());
@@ -147,7 +147,7 @@ describe('useChat Hook', () => {
       await result.current.send('Direct message');
     });
     
-    expect(result.current.msgs[1].content).toBe('Direct message');
+    expect(result.current.msgs[1].text).toBe('Direct message');
     expect(result.current.input).toBe(''); // Input should remain empty
   });
 });
