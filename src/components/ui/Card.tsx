@@ -1,8 +1,36 @@
 import React from 'react';
-import { C } from '../../constants/colors';
+import styles from './Card.module.css';
 
-const Card=({children,style:sx={}}: {children: React.ReactNode, style?: React.CSSProperties})=>(
-  <div style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:20,...sx}}>{children}</div>
-);
+interface CardProps {
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'interactive' | 'bordered' | 'elevated';
+  onClick?: () => void;
+}
+
+const Card = ({
+  children,
+  style: sx = {},
+  size = 'md',
+  variant = 'default',
+  onClick
+}: CardProps) => {
+  const cardClasses = [
+    styles.card,
+    styles[size],
+    variant !== 'default' ? styles[variant] : '',
+  ].filter(Boolean).join(' ');
+
+  return (
+    <div
+      className={cardClasses}
+      style={sx}
+      onClick={onClick}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default Card;

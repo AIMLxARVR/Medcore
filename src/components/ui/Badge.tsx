@@ -1,8 +1,34 @@
 import React from 'react';
-import { C } from '../../constants/colors';
+import styles from './Badge.module.css';
 
-const Badge=({text,color=C.primaryMid,bg=C.primaryLight}: {text: string, color?: string, bg?: string})=>(
-  <span style={{display:"inline-block",padding:"2px 8px",borderRadius:12,background:bg,color,fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>{text}</span>
-);
+interface BadgeProps {
+  text: string;
+  color?: string;
+  bg?: string;
+  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'success' | 'warning' | 'error';
+}
+
+const Badge = ({ 
+  text, 
+  color, 
+  bg, 
+  size = 'md',
+  variant = 'primary'
+}: BadgeProps) => {
+  const customStyle = {
+    color: color || undefined,
+    backgroundColor: bg || undefined,
+  };
+
+  return (
+    <span 
+      className={`${styles.badge} ${styles[size]} ${styles[variant]}`}
+      style={customStyle}
+    >
+      {text}
+    </span>
+  );
+};
 
 export default Badge;

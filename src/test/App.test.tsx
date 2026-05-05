@@ -123,12 +123,16 @@ describe('MedCore App Integration Tests', () => {
     const analyzeButton = screen.getByText('Analyze Symptoms');
     fireEvent.click(analyzeButton);
     
-    // Should show analysis results
+    // Should show analysis results with longer timeout and better selector
     await waitFor(() => {
-      expect(screen.getByText((content, element) => {
-        return element?.textContent?.includes('Urgency Level:');
-      })).toBeInTheDocument();
-    }, { timeout: 3000 });
+      // Look for the urgency level text directly
+      const urgencyLevel = screen.getByText(/Urgency Level:/i);
+      expect(urgencyLevel).toBeInTheDocument();
+
+      // Also verify other key elements are present
+      expect(screen.getByText(/Possible Conditions/i)).toBeInTheDocument();
+      expect(screen.getByText(/Recommendations/i)).toBeInTheDocument();
+    }, { timeout: 5000 });
   });
 
   it('admin dashboard displays system information', () => {

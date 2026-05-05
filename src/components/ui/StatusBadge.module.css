@@ -1,0 +1,129 @@
+/* StatusBadge Component Styles */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Status indicator dot */
+.statusIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Status variants */
+.connected {
+  background-color: var(--color-green-light);
+  color: var(--color-green);
+}
+
+.connected .statusIndicator {
+  background-color: var(--color-green);
+}
+
+.disconnected {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+}
+
+.disconnected .statusIndicator {
+  background-color: var(--color-red);
+}
+
+.pending {
+  background-color: var(--color-amber-light);
+  color: var(--color-amber);
+}
+
+.pending .statusIndicator {
+  background-color: var(--color-amber);
+}
+
+.success {
+  background-color: var(--color-green-light);
+  color: var(--color-green);
+}
+
+.success .statusIndicator {
+  background-color: var(--color-green);
+}
+
+.warning {
+  background-color: var(--color-amber-light);
+  color: var(--color-amber);
+}
+
+.warning .statusIndicator {
+  background-color: var(--color-amber);
+}
+
+.error {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+}
+
+.error .statusIndicator {
+  background-color: var(--color-red);
+}
+
+.confirmed {
+  background-color: var(--color-green-light);
+  color: var(--color-green);
+}
+
+.confirmed .statusIndicator {
+  background-color: var(--color-green);
+}
+
+.completed {
+  background-color: var(--color-bg-secondary);
+  color: var(--color-muted);
+}
+
+.completed .statusIndicator {
+  background-color: var(--color-muted);
+}
+
+.cancelled {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+}
+
+.cancelled .statusIndicator {
+  background-color: var(--color-red);
+}
+
+.syncing {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-mid);
+}
+
+.syncing .statusIndicator {
+  background-color: var(--color-primary-mid);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

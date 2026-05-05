@@ -14,14 +14,26 @@ describe('UI Components', () => {
       render(<Avatar init="AB" color="#3b82f6" size={60} />);
       const avatarText = screen.getByText('AB');
       const avatar = avatarText.parentElement;
-      expect(avatar).toHaveStyle({ width: '60px', height: '60px' });
+      expect(avatar).toBeInTheDocument();
+      // For custom numeric size, check inline styles
+      expect(avatar).toHaveStyle({ 
+        width: '60px', 
+        height: '60px',
+        fontSize: '18px'
+      });
     });
 
     it('renders with correct color', () => {
       render(<Avatar init="CD" color="#ff0000" size={40} />);
       const avatarText = screen.getByText('CD');
       const avatar = avatarText.parentElement;
-      expect(avatar).toHaveStyle({ background: expect.stringContaining('#ff0000') });
+      expect(avatar).toBeInTheDocument();
+      // Check that custom color is applied via inline styles
+      expect(avatar).toHaveStyle({ 
+        backgroundColor: expect.stringContaining('#ff000022'),
+        borderColor: expect.stringContaining('#ff000044'),
+        color: '#ff0000'
+      });
     });
   });
 
@@ -36,8 +48,11 @@ describe('UI Components', () => {
       render(<Badge text="Custom" color="#ff0000" bg="#ff0000" />);
       const badgeText = screen.getByText('Custom');
       expect(badgeText).toBeInTheDocument();
-      const badge = badgeText.parentElement;
-      expect(badge).toHaveStyle({ color: '#ff0000', backgroundColor: '#ff0000' });
+      // Check that custom colors are applied via inline styles
+      expect(badgeText).toHaveStyle({ 
+        color: '#ff0000', 
+        backgroundColor: '#ff0000' 
+      });
     });
   });
 
@@ -51,13 +66,24 @@ describe('UI Components', () => {
     it('renders with correct variant', () => {
       render(<Button variant="outline">Outline Button</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('outline');
+      expect(button).toBeInTheDocument();
+      // Check variant via computed styles since CSS Modules uses hashed class names
+      expect(button).toHaveStyle({
+        backgroundColor: 'transparent',
+        borderColor: 'var(--color-primary)',
+        color: 'var(--color-primary)'
+      });
     });
 
     it('renders with correct size', () => {
       render(<Button size="sm">Small Button</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('sm');
+      expect(button).toBeInTheDocument();
+      // Check size via computed styles
+      expect(button).toHaveStyle({
+        padding: '5px 11px',
+        fontSize: '12px'
+      });
     });
 
     it('handles click events', () => {

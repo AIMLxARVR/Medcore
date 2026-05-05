@@ -1,24 +1,33 @@
 import React from 'react';
+import styles from './Avatar.module.css';
 
-const Av = ({ init, color, size = 40 }: { init: string; color: string; size?: number }) => (
-  <div
-    style={{
-      width: size,
-      height: size,
-      borderRadius: "50%",
-      background: `${color}22`,
-      border: `2px solid ${color}44`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: size * 0.3,
-      fontWeight: 700,
-      color,
-      flexShrink: 0,
-    }}
-  >
-    {init}
-  </div>
-);
+interface AvatarProps {
+  init: string;
+  color?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | number;
+}
 
-export default Av;
+const Avatar = ({ init, color, size = 'md' }: AvatarProps) => {
+  const sizeClass = typeof size === 'string' ? styles[size] : '';
+  const customStyle = typeof size === 'number' ? {
+    width: `${size}px`,
+    height: `${size}px`,
+    fontSize: `${size * 0.3}px`,
+  } : {};
+
+  return (
+    <div
+      className={`${styles.avatar} ${sizeClass}`}
+      style={{
+        backgroundColor: color ? `${color}22` : undefined,
+        borderColor: color ? `${color}44` : undefined,
+        color: color || undefined,
+        ...customStyle,
+      }}
+    >
+      {init}
+    </div>
+  );
+};
+
+export default Avatar;

@@ -1,0 +1,112 @@
+/* NavBar Component Styles */
+.nav {
+  background-color: var(--color-card);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  height: 48px;
+  gap: 2px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-right: auto;
+  flex-shrink: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.logo:hover {
+  opacity: 0.8;
+}
+
+.logoIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoText {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.logoSubtitle {
+  font-size: 8px;
+  color: var(--color-muted);
+  letter-spacing: 0.08em;
+}
+
+.navButton {
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-muted);
+  border-bottom: 2px solid transparent;
+  height: 48px;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.navButton:hover {
+  color: var(--color-primary);
+}
+
+.navButton.active {
+  font-weight: 800;
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.statusIndicator {
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-green);
+  animation: pulse 2s infinite;
+}
+
+.statusText {
+  font-size: 8px;
+  color: var(--color-green);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -1,11 +1,46 @@
 import React from 'react';
-import Badge from './Badge';
-import { C } from '../../constants/colors';
+import styles from './StatusBadge.module.css';
 
-const StatusBadge=({status}: {status: string})=>{
-  const m={confirmed:{bg:C.greenLight,c:C.green,l:"Confirmed"},pending:{bg:C.amberLight,c:C.amber,l:"Pending"},completed:{bg:"#F1F5F9",c:C.muted,l:"Completed"},cancelled:{bg:C.redLight,c:C.red,l:"Cancelled"},success:{bg:C.greenLight,c:C.green,l:"Success"},warning:{bg:C.amberLight,c:C.amber,l:"Warning"},error:{bg:C.redLight,c:C.red,l:"Error"},syncing:{bg:C.primaryLight,c:C.primaryMid,l:"Syncing"},connected:{bg:C.greenLight,c:C.green,l:"Connected"},disconnected:{bg:C.redLight,c:C.red,l:"Disconnected"}};
-  const s=m[status]||m.pending;
-  return <Badge text={s.l} color={s.c} bg={s.bg}/>;
+type StatusType = 
+  | 'connected' 
+  | 'disconnected' 
+  | 'pending' 
+  | 'success' 
+  | 'warning' 
+  | 'error' 
+  | 'confirmed' 
+  | 'completed' 
+  | 'cancelled' 
+  | 'syncing';
+
+interface StatusBadgeProps {
+  status: StatusType | string;
+  showIndicator?: boolean;
+}
+
+const statusConfig: Record<StatusType, { label: string; className: string }> = {
+  connected: { label: 'Connected', className: styles.connected },
+  disconnected: { label: 'Disconnected', className: styles.disconnected },
+  pending: { label: 'Pending', className: styles.pending },
+  success: { label: 'Success', className: styles.success },
+  warning: { label: 'Warning', className: styles.warning },
+  error: { label: 'Error', className: styles.error },
+  confirmed: { label: 'Confirmed', className: styles.confirmed },
+  completed: { label: 'Completed', className: styles.completed },
+  cancelled: { label: 'Cancelled', className: styles.cancelled },
+  syncing: { label: 'Syncing', className: styles.syncing },
+};
+
+const StatusBadge = ({ status, showIndicator = true }: StatusBadgeProps) => {
+  const statusKey = status as StatusType;
+  const config = statusConfig[statusKey] || statusConfig.pending;
+
+  return (
+    <div className={`${styles.statusBadge} ${config.className}`}>
+      {showIndicator && <span className={styles.statusIndicator} />}
+      <span>{config.label}</span>
+    </div>
+  );
 };
 
 export default StatusBadge;

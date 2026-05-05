@@ -1,0 +1,86 @@
+/* Button Component Styles */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Size variants */
+.sm {
+  padding: 5px 11px;
+  font-size: 12px;
+}
+
+.md {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.lg {
+  padding: 11px 22px;
+  font-size: 14px;
+}
+
+/* Variant styles */
+.primary {
+  background-color: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.ghost {
+  background-color: transparent;
+  color: var(--color-muted);
+  border-color: var(--color-border);
+}
+
+.success {
+  background-color: var(--color-green);
+  color: #fff;
+  border-color: var(--color-green);
+}
+
+.danger {
+  background-color: var(--color-red);
+  color: #fff;
+  border-color: var(--color-red);
+}
+
+.purple {
+  background-color: var(--color-purple);
+  color: #fff;
+  border-color: var(--color-purple);
+}
+
+/* Full width variant */
+.full {
+  width: 100%;
+}

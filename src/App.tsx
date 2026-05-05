@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import NavBar from './components/shared/NavBar';
+import { NavBar } from './components';
+import { ViewType, Doctor } from './types';
 import HomeView from './features/home/HomeView';
 import ChatbotView from './features/chatbot/ChatbotView';
 import DoctorsView from './features/doctors/DoctorsView';
@@ -10,14 +11,14 @@ import EtlView from './features/etl/EtlView';
 import AdminView from './features/admin/AdminView';
 
 function App() {
-  const [currentView, setCurrentView] = useState('home');
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [currentView, setCurrentView] = useState<ViewType>('home');
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
 
-  const handleNav = (view: string) => {
+  const handleNav = (view: ViewType) => {
     setCurrentView(view);
   };
 
-  const handlePickDoctor = (doctor: any) => {
+  const handlePickDoctor = (doctor: Doctor) => {
     setSelectedDoctor(doctor);
   };
 
@@ -45,9 +46,9 @@ function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
-      <NavBar currentView={currentView} onNav={handleNav} />
-      <main>
+    <div className="app-container">
+      <NavBar view={currentView} onNav={handleNav} />
+      <main className="app-main">
         {renderCurrentView()}
       </main>
     </div>
