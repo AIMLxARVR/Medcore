@@ -1,0 +1,177 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BKASH
+  NAGAD
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// User model - base for all users (patients, doctors, admins)
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash String    @map("password_hash")
+  role         Role      @default(PATIENT)
+  phone        String?
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  bloodGroup   String?   @map("blood_group")
+  dateOfBirth  DateTime? @map("date_of_birth")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  patientProfile PatientProfile?
+  doctorProfile DoctorProfile?
+  appointments Appointment[]
+  payments     Payment[]
+  reviews     Review[]
+  auditLogs   AuditLog[]
+
+  @@map("users")
+}
+
+// Patient specific profile
+model PatientProfile {
+  id               String  @id @default(cuid())
+  userId           String  @unique @map("user_id")
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emergencyContact String? @map("emergency_contact")
+  insuranceId      String? @map("insurance_id")
+  address         String?
+  medicalHistory  Json?   @map("medical_history")
+
+  @@map("patient_profiles")
+}
+
+// Doctor specific profile
+model DoctorProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title      String   // MBBS, MD, FCPS, etc.
+  specialty  String   // Cardiology, Neurology, etc.
+  department String
+  fee        Int
+  rating     Float    @default(0)
+  reviewCount Int     @default(0) @map("review_count")
+  available  Boolean  @default(true)
+  slots      Json     // Weekly schedule: { monday: ["9:00", "9:30"], tuesday: [...] }
+  qualifications Json? @map("qualifications")
+  experience    Int?    @map("experience") // years
+  bio           String?
+
+  @@map("doctor_profiles")
+}
+
+// Appointments
+model Appointment {
+  id         String            @id @default(cuid())
+  patientId  String            @map("patient_id")
+  patient   User              @relation(fields: [patientId], references: [id])
+  doctorId  String            @map("doctor_id")
+  doctor    User              @relation(fields: [doctorId], references: [id])
+  dateTime  DateTime          @map("date_time")
+  status    AppointmentStatus @default(PENDING)
+  serialNo  Int?             @map("serial_no")
+  notes     String?
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  payment   Payment?
+  review    Review?
+
+  @@map("appointments")
+}
+
+// Payments
+model Payment {
+  id             String         @id @default(cuid())
+  appointmentId String         @unique @map("appointment_id")
+  appointment   Appointment    @relation(fields: [appointmentId], references: [id])
+  amount        Int
+  method        PaymentMethod
+  status        PaymentStatus  @default(PENDING)
+  transactionId String?       @map("transaction_id")
+  invoiceNo     String        @unique @map("invoice_no")
+  paidAt        DateTime?      @map("paid_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  @@map("payments")
+}
+
+// Reviews/Ratings
+model Review {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique @map("appointment_id")
+  appointment  Appointment @relation(fields: [appointmentId], references: [id])
+  patientId    String   @map("patient_id")
+  patient     User     @relation(fields: [patientId], references: [id])
+  doctorId    String   @map("doctor_id")
+  rating      Int      // 1-5
+  comment     String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("reviews")
+}
+
+// Audit Logs for tracking changes
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  user     User     @relation(fields: [userId], references: [id])
+  action   String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT
+  entity   String   // Appointment, User, Payment
+  entityId String   @map("entity_id")
+  metadata Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+// Refresh tokens for JWT refresh
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token    String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
+}
