@@ -1,308 +1,156 @@
-# MedCore - Medical AI Assistant Application
+# MedCore AI — Intelligent Healthcare Management Platform
 
-## Overview
+**MedCore AI** is an AI-powered diagnostic centre management system built with React, Node.js, and AI services (Anthropic Claude). It provides intelligent diagnostics, second-opinion systems, appointment booking, and conversational assistants for patients, doctors, and administrators.
 
-MedCore is a modern medical AI assistant application built with React, TypeScript, and Vite. It provides patients with AI-powered health consultations, appointment booking, doctor search, and portal access.
+## Products
 
-## 🚀 Tech Stack
+| Product | Description |
+|---------|-------------|
+| **MedBot** | AI Assistant for symptom checking, appointment booking, and patient queries. |
+| **AI Clinical Panel** | Diagnosis assistance, lab report analysis & prescription review for doctors. |
+| **ETL Hub** | Real-time sync with ERP, Lab systems & Insurance. |
 
-- **React 18** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Vitest** - Testing framework
-- **CSS Modules** - Component styling
-- **Lucide React** - Icon library
+## Tech Stack
 
-## 📁 Project Structure
+- **Frontend:** React 18, TypeScript, Vite, CSS Modules, Recharts
+- **Backend:** Node.js, Express.js, Prisma ORM, PostgreSQL
+- **AI Services:** Anthropic Claude (chat), Groq (fast diagnosis)
+- **Storage:** AWS S3 (files), MongoDB (logs)
+- **Infrastructure:** Docker, GitHub Actions
 
-```
-src/
-├── components/          # Reusable UI components
-│   ├── ui/             # Basic UI components (Button, Card, etc.)
-│   └── shared/         # Shared components (NavBar, TypingDots)
-├── features/           # Feature-specific components
-│   ├── admin/          # Admin dashboard
-│   ├── ai-clinical/    # AI clinical assistant
-│   ├── booking/        # Appointment booking
-│   ├── chatbot/        # AI chatbot interface
-│   ├── doctors/        # Doctor listings
-│   ├── etl/            # ETL operations
-│   ├── home/           # Home page
-│   └── portal/         # Patient portal
-├── hooks/              # Custom React hooks
-├── services/           # External service integrations
-├── styles/             # Global styles and design tokens
-├── types/              # TypeScript type definitions
-└── test/               # Test files
-```
+## Getting Started
 
-## 🎨 Styling Architecture
+### Prerequisites
 
-### CSS Modules
+- Node.js ≥18, npm ≥9
+- PostgreSQL 16+ (via Docker)
+- API keys for Anthropic, Groq (optional for full AI features)
 
-All components use CSS Modules for styling. This provides:
-- Scoped styles to avoid conflicts
-- Better performance through build-time processing
-- Co-located styles with components
-- TypeScript integration
+### Local Development
 
-### Design Tokens
+```bash
+# Clone the repository
+git clone https://github.com/labaid-ai/medcore.git
+cd medcore
 
-Design tokens are defined in `src/styles/variables.css` as CSS custom properties:
+# Install frontend dependencies
+npm install
 
-```css
-:root {
-  --color-primary: #0C4A6E;
-  --color-green: #059669;
-  --spacing-md: 1rem;
-  --radius-lg: 12px;
-  /* ... more tokens */
-}
+# Start PostgreSQL with Docker
+docker-compose up -d
+
+# Start backend (optional - for full features)
+cd backend
+npm install
+node src/index.js
+
+# Start frontend
+npm run dev
 ```
 
-### Usage Example
+### Environment Variables
 
-```tsx
-// Component.tsx
-import styles from './Component.module.css';
+Copy `env.example` to `.env.local` and configure:
 
-function Component() {
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Title</h1>
-    </div>
-  );
-}
+```bash
+cp env.example .env.local
 ```
 
-```css
-/* Component.module.css */
-.container {
-  padding: var(--spacing-md);
-  background-color: var(--color-card);
-}
-
-.title {
-  font-size: 24px;
-  color: var(--color-text);
-}
-```
-
-## 🧩 Component Library
-
-### UI Components
-
-#### Avatar
-```tsx
-<Avatar init="JD" color="#3b82f6" size="md" />
-```
-
-#### Badge
-```tsx
-<Badge text="Success" variant="success" size="md" />
-```
-
-#### Button
-```tsx
-<Button variant="primary" size="md" onClick={handleClick}>
-  Click Me
-</Button>
-```
-
-#### Card
-```tsx
-<Card size="md" variant="elevated">
-  Content
-</Card>
-```
-
-#### StatusBadge
-```tsx
-<StatusBadge status="connected" showIndicator={true} />
-```
-
-### Shared Components
-
-#### NavBar
-```tsx
-<NavBar view="home" onNav={handleNav} />
-```
-
-#### TypingDots
-```tsx
-<TypingDots size="md" color="primary" label="Thinking" />
-```
-
-## 📝 Type Definitions
-
-Common types are centralized in `src/types/index.ts`:
-
-```typescript
-export type ViewType = 'home' | 'chatbot' | 'doctors' | ...;
-
-export interface Doctor {
-  id: string;
-  name: string;
-  specialty: string;
-  // ...
-}
-```
-
-## 🧪 Testing
+Key variables:
+- `VITE_ANTHROPIC_API_KEY` - For AI chat (required for MedBot)
+- `DATABASE_URL` - PostgreSQL connection (for backend)
 
 ### Running Tests
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:ui
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run unit tests
-npm run test:unit
-
-# Run integration tests
-npm run test:integration
+npm test          # Run all tests
+npm run dev      # Start dev server
 ```
 
-### Testing Components
+## Project Structure
 
-```tsx
-import { render, screen } from '@testing-library/react';
-import { Button } from './Button';
-
-describe('Button', () => {
-  it('renders with correct variant class', () => {
-    render(<Button variant="outline">Click</Button>);
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('outline');
-  });
-});
+```
+medcore/
+├── src/
+│   ├── components/      # Reusable UI components
+│   ├── features/      # View components (Home, Doctors, Chatbot, etc.)
+│   ├── hooks/         # Custom React hooks
+│   ├── services/      # API clients
+│   ├── utils/        # Utility functions
+│   ├── constants/     # Design tokens, data
+│   ├── types/        # TypeScript types
+│   └── test/         # Test files
+├── backend/          # Express.js API server
+├── docs/             # Documentation
+└── docker-compose.yml # PostgreSQL setup
 ```
 
-## 🏗️ Development
+## Key Features
 
-### Getting Started
+- 🩺 **AI Symptom Checker** - Differential diagnosis with ICD-10 codes
+- 📅 **Appointment Booking** - Doctor selection, slot booking, confirmation
+- 💊 **Prescription Checker** - Drug interaction analysis
+- 📊 **Lab Report Analysis** - Flag abnormal values, clinical interpretation
+- 💬 **MedBot Chat** - Conversational AI for patient queries
+- 👨‍⚕️ **Doctor Dashboard** - Schedule management, patient history
+- 📂 **Patient Portal** - Reports, prescriptions, appointments
+- 🔒 **Role-Based Access** - Admin, Doctor, Patient roles
+- 🔄 **ETL Integration** - ERP, LIS, Insurance sync
 
-```bash
-# Install dependencies
-npm install
+## User Roles
 
-# Start development server
-npm run dev
+| Role | Access |
+|------|--------|
+| **Patient** | Book appointments, view reports, chat with MedBot |
+| **Doctor** | View schedule, patient history, write prescriptions |
+| **Admin** | Full system control, analytics, user management |
 
-# Build for production
-npm run build
+## API Documentation
 
-# Preview production build
-npm run preview
+The backend provides RESTful APIs under `/api/v1`:
+
+- `/api/v1/auth/*` - Authentication
+- `/api/v1/doctors/*` - Doctor management
+- `/api/v1/appointments/*` - Booking system
+- `/api/v1/ai/*` - AI services (chat, diagnosis)
+- `/api/v1/reviews/*` - Patient reviews
+- `/api/v1/admin/*` - Admin dashboard
+
+See `docs/postman_collection.json` for full API details.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Frontend (React)                       │
+├─────────────────────────────────────────────────────────────┤
+│  Home │ Doctors │ Chatbot │ AI Clinical │ Portal │ ETL │ Admin│
+├─────────────────────────────────────────────────────────────┤
+│                     API Services                          │
+│                 (aiApi, doctorsApi, etc.)                 │
+├─────────────────────────────────────────────────────────────┤
+│                   Backend (Express)                      │
+│  Auth │ Doctors │ Appointments │ AI │ Reviews │ Admin        │
+├─────────────────────────────────────────────────────────────┤
+│                   Database (PostgreSQL)                  │
+│            via Prisma ORM                                 │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Code Quality
+## Contributing
 
-```bash
-# Run linter
-npm run lint
+1. Create a feature branch (`git checkout -b feature/your-feature`)
+2. Make changes and add tests
+3. Commit with clear messages
+4. Push to the repository
+5. Create a Pull Request
 
-# Type check
-npm run typecheck
-```
+## License
 
-## 📚 Best Practices
+Proprietary — All rights reserved by LABAID AI.
 
-### Component Development
+## Support
 
-1. **Use CSS Modules** for all component styling
-2. **Define TypeScript interfaces** for props
-3. **Follow naming conventions**:
-   - Component files: PascalCase (e.g., `Button.tsx`)
-   - Style files: `ComponentName.module.css`
-   - Test files: `ComponentName.test.tsx`
-
-4. **Co-locate styles** with components
-5. **Use design tokens** instead of hardcoded values
-6. **Write tests** for all components
-
-### Styling Guidelines
-
-**DO:**
-```tsx
-import styles from './MyComponent.module.css';
-
-<div className={styles.container}>
-  Content
-</div>
-```
-
-**DON'T:**
-```tsx
-<div style={{ padding: '20px', borderRadius: '8px' }}>
-  Content
-</div>
-```
-
-### Type Safety
-
-**DO:**
-```tsx
-interface Props {
-  title: string;
-  count: number;
-  onAction: () => void;
-}
-
-function Component({ title, count, onAction }: Props) {
-  // ...
-}
-```
-
-**DON'T:**
-```tsx
-function Component(props: any) {
-  // ...
-}
-```
-
-## 🎯 Features
-
-- **AI Chatbot**: Interactive health consultation
-- **Doctor Search**: Find and book appointments
-- **Patient Portal**: Access health records
-- **AI Clinical**: AI-powered clinical analysis
-- **ETL Hub**: Data management
-- **Admin Dashboard**: System administration
-
-## 🔐 Security Considerations
-
-- All API calls should be authenticated
-- Patient data must be encrypted
-- Follow HIPAA compliance guidelines
-- Regular security audits recommended
-
-## 📖 Documentation
-
-- [Styling Guide](./STYLING_GUIDE.md) - Detailed styling architecture
-- [Refactoring Summary](./REFACTORING_SUMMARY.md) - Recent changes and improvements
-
-## 🤝 Contributing
-
-1. Follow the established code style
-2. Write tests for new features
-3. Update documentation
-4. Submit pull requests for review
-
-## 📄 License
-
-[Add your license information here]
-
-## 📞 Support
-
-For support and questions, please contact [your support contact].
-
----
-
-Built with ❤️ for better healthcare
+For issues and questions:
+- Email: support@labaid-ai.com
+- Phone: 01700-000000 (Bangladesh)

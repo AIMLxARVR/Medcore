@@ -196,7 +196,7 @@ router.post('/export', authenticate, requireRole('ADMIN'), async (req, res) => {
         headers.join(','),
         ...data.map(row => 
           headers.map(h => JSON.stringify(row[h] || '')).join(',')
-      );
+        );
       
       res.setHeader('Content-Type', 'text/csv');
       res.setHeader('Content-Disposition', `attachment; filename=${filename}.csv`);
