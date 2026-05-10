@@ -1,0 +1,10 @@
+{
+  "permission": {
+    "read": {
+      "C:/FTS/MED-AI/DemoRepo/.kilo/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "C:/FTS/MED-AI/DemoRepo/.kilo/get-shit-done/*": "allow"
+    }
+  }
+}
