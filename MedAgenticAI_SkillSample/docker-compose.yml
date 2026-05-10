@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./app
+    ports:
+      - "8000:8000"
+    environment:
+      - MEDCORE_ENV=development
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./observability:/app/observability
+    depends_on:
+      - vectordb
+      - redis
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://api:8000
+
+  vectordb:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+
+volumes:
+  qdrant_storage:

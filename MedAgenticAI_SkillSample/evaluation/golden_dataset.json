@@ -1,0 +1,64 @@
+[
+  {
+    "case_id": "MC-EVAL-001",
+    "description": "Classic STEMI presentation",
+    "input": {
+      "presentation": "67M with 30 minutes of crushing substernal chest pain radiating to left arm, diaphoresis, nausea. PMH: HTN, DM2, smoker. Vitals: BP 90/60, HR 105, SpO2 96%.",
+      "labs": {"troponin_I": 2.8, "ck_mb": 45, "bnp": 180},
+      "imaging": "ECG: ST elevation V1-V4 with reciprocal changes II, III, aVF"
+    },
+    "expected": {
+      "top_differential": "STEMI",
+      "icd10": "I21.09",
+      "urgency_score_min": 0.9,
+      "escalation_required": true,
+      "cannot_miss_must_include": ["aortic dissection", "pulmonary embolism"]
+    }
+  },
+  {
+    "case_id": "MC-EVAL-002",
+    "description": "Stroke mimic — hypoglycemia",
+    "input": {
+      "presentation": "55F found unresponsive by family. Left-sided facial droop, arm weakness. PMH: DM1. Vitals: BP 145/88, HR 88, glucose not yet checked.",
+      "labs": {"glucose": 32},
+      "imaging": "CT head: no acute intracranial hemorrhage"
+    },
+    "expected": {
+      "top_differential": "Hypoglycemia",
+      "icd10": "E16.0",
+      "urgency_score_min": 0.85,
+      "escalation_required": true,
+      "cannot_miss_must_include": ["ischemic stroke"]
+    }
+  },
+  {
+    "case_id": "MC-EVAL-003",
+    "description": "Routine URI — low urgency",
+    "input": {
+      "presentation": "28F with 3 days of runny nose, sore throat, low-grade fever 37.8°C, mild cough. No dyspnea, no rash, vaccinations up to date. Vitals stable.",
+      "labs": {},
+      "imaging": "None"
+    },
+    "expected": {
+      "top_differential": "Viral upper respiratory tract infection",
+      "icd10": "J06.9",
+      "urgency_score_max": 0.3,
+      "escalation_required": false
+    }
+  },
+  {
+    "case_id": "MC-EVAL-004",
+    "description": "Sepsis from UTI",
+    "input": {
+      "presentation": "82F nursing home resident with confusion, fever 39.2°C, decreased urine output x2 days. PMH: recurrent UTIs, CKD3. Vitals: BP 88/55, HR 118, RR 24, SpO2 94%.",
+      "labs": {"wbc": 18.5, "lactate": 3.8, "creatinine": 2.9, "urinalysis": "positive nitrites, +++ WBC"},
+      "imaging": "CXR: no infiltrates"
+    },
+    "expected": {
+      "top_differential": "Urosepsis",
+      "icd10": "A41.51",
+      "urgency_score_min": 0.8,
+      "escalation_required": true
+    }
+  }
+]

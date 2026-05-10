@@ -1,0 +1,40 @@
+{
+  "model": "claude-opus-4-5",
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(pytest *)",
+      "Bash(pip *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(docker-compose *)",
+      "Read",
+      "Edit",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(git push --force *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      ".claude/hooks/format-on-save.sh",
+      ".claude/hooks/pii-redact-check.sh"
+    ],
+    "PreToolUse": [
+      ".claude/hooks/safety-gate.sh"
+    ]
+  },
+  "outputStyle": "terse",
+  "statusLine": ".claude/statusline.sh",
+  "env": {
+    "MEDCORE_ENV": "development",
+    "LOG_LEVEL": "INFO"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "medcore-diagnostic-ai",
+  "version": "1.0.0",
+  "description": "Clinical-grade diagnostic AI agents for MedCore+",
+  "author": "medcore-team",
+  "agents": [
+    "diagnostic-orchestrator",
+    "symptom-analyst",
+    "differential-builder",
+    "lab-interpreter",
+    "triage-escalation",
+    "report-generator",
+    "drug-checker",
+    "literature-searcher"
+  ],
+  "commands": ["diagnose", "eval-pipeline", "redact", "commit"],
+  "skills": ["diagnostic-reasoner", "report-generator", "triage-assistant"],
+  "mcp_servers": ["pubmed", "icd10-lookup", "drug-interaction-db"],
+  "hooks": {
+    "PostToolUse": ["format-on-save.sh", "pii-redact-check.sh"],
+    "PreToolUse": ["safety-gate.sh"]
+  }
+}
+
+# Run /plugin install medcore-diagnostic-ai
+# Once. Then forever.
