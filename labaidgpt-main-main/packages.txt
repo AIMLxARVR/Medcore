@@ -1,0 +1,12 @@
+portaudio19-dev
+python3-pyaudio
+libportaudio2
+libportaudiocpp0
+ffmpeg
+tesseract-ocr
+tesseract-ocr-ben
+tesseract-ocr-eng
+libsm6
+libxext6
+libxrender-dev
+libglib2.0-0
